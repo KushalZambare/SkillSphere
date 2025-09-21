@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Career and College Recommendations</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Personalized Recommendations</h1>
+        
+        <h2>Career Recommendations</h2>
+        <div id="career-recommendations">
+            {% if career_recommendations %}
+                <ul>
+                    {% for career in career_recommendations %}
+                        <li>
+                            <h3>{{ career.career_title }}</h3>
+                            <p><strong>Description:</strong> {{ career.description }}</p>
+                            <p><strong>Required Skills:</strong> {{ career.required_skills | join(', ') }}</p>
+                            <p><strong>Education Path:</strong> {{ career.education_path }}</p>
+                            <p><strong>Job Prospects:</strong> {{ career.job_prospects }}</p>
+                            <p><strong>Salary Range:</strong> {{ career.salary_range }}</p>
+                            <p><strong>Growth Potential:</strong> {{ career.growth_potential }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No career recommendations available.</p>
+            {% endif %}
+        </div>
+
+        <h2>College Recommendations</h2>
+        <div id="college-recommendations">
+            {% if college_recommendations %}
+                <ul>
+                    {% for college in college_recommendations %}
+                        <li>
+                            <h3>{{ college.college_name }}</h3>
+                            <p><strong>Location:</strong> {{ college.location }}</p>
+                            <p><strong>Programs:</strong> {{ college.programs | join(', ') }}</p>
+                            <p><strong>Ranking:</strong> {{ college.ranking }}</p>
+                            <p><strong>Admission Requirements:</strong> {{ college.admission_requirements }}</p>
+                            <p><strong>Fees Range:</strong> {{ college.fees_range }}</p>
+                            <p><strong>Notable Features:</strong> {{ college.notable_features }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No college recommendations available.</p>
+            {% endif %}
+        </div>
+
+        <h2>Personalized Roadmap</h2>
+        <div id="roadmap">
+            <p>{{ roadmap }}</p>
+        </div>
+
+        <a href="{{ url_for('index') }}">Go back to input your profile</a>
+    </div>
+</body>
+</html>
