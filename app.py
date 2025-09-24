@@ -2,12 +2,12 @@ from flask import Flask, render_template, request, redirect, url_for
 from core.user_input import create_user_profile
 from core.recommendation_system import CareerRecommendationSystem
 from core.utils import save_recommendations
-import requests  # Add this import
+import requests  
 
 app = Flask(__name__)
 
 # Use the provided API key
-API_KEY = "AIzaSyDX5N325lS844sMKxkcz0vIjQ2Hxhr5ars"
+API_KEY = "Your API Key"
 system = CareerRecommendationSystem(API_KEY)
 
 @app.route('/')
