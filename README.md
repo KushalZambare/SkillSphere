@@ -11,7 +11,7 @@ SkillSphere is an AI-powered web application that provides personalized career a
 - **College Matching:** Receive a curated list of colleges/universities that align with your profile, location, and budget.
 - **Actionable Roadmap:** Obtain a step-by-step roadmap to achieve your career goals, including academic, extracurricular, and skill-building milestones.
 - **Modern Web Interface:** Simple, user-friendly interface for input and results.
-- **Save Reports:** Download your personalized recommendations and roadmap for future reference.
+- **Save Reports:** Download your personalized recommendations and roadmap for future reference in txt file.
 
 ---
 
