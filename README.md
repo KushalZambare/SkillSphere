@@ -19,21 +19,21 @@ SkillSphere is an AI-powered web application that provides personalized career a
 
 ```
 SkillSphere/
-├── app.py                  # Main Flask application
+├── app.py                  
 ├── core/
-│   ├── __init__.py        # Core module initializer
-│   ├── models.py          # Data models for user and recommendations
-│   ├── recommendation_system.py  # AI-powered recommendation logic
-│   ├── user_input.py      # User profile creation and parsing
-│   └── utils.py           # Utility functions (API, parsing, saving)
+│   ├── __init__.py       
+│   ├── models.py          
+│   ├── recommendation_system.py  
+│   ├── user_input.py      
+│   └── utils.py          
 ├── static/
 │   └── css/
-│       └── style.css      # Application styles
+│       └── style.css      
 ├── templates/
-│   ├── index.html         # User input form
-│   └── results.html       # Results display page
-├── requirements.txt       # Python dependencies
-└── README.md              # Project documentation
+│   ├── index.html         
+│   └── results.html      
+├── requirements.txt       
+└── README.md            
 ```
 
 ---
