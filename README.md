@@ -64,7 +64,7 @@ SkillSphere/
    Go to [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 3. **Fill out your profile:**
-   Enter your academic details, interests, and preferences, then submit the form to receive your personalized recommendations and roadmap.
+   Enter your academic details, interests and preferences, then submit the form to receive your personalized recommendations and roadmap.
 
 4. **Save your results:**
    Download your recommendations and roadmap for future planning.
