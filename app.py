@@ -6,7 +6,7 @@ import requests
 
 app = Flask(__name__)
 
-# Use the provided API key
+# Use Your API Key
 API_KEY = "Your API Key"
 system = CareerRecommendationSystem(API_KEY)
 
