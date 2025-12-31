@@ -4,15 +4,12 @@ from core.utils import make_ai_request, parse_career_response, parse_college_res
 from typing import List
 
 class CareerRecommendationSystem:
-    """AI-powered Career Recommendation System using Google AI REST API"""
     
     def __init__(self, api_key: str):
-        """Initialize the system with Google AI API key"""
         self.api_key = api_key
         self.base_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
     
     def generate_career_recommendations(self, user_profile: UserProfile) -> List[CareerRecommendation]:
-        """Generate career recommendations using Google AI"""
         
         prompt = f"""
         Based on the following student profile, provide 5 personalized career recommendations:
@@ -52,7 +49,6 @@ class CareerRecommendationSystem:
         return []
     
     def generate_college_recommendations(self, user_profile: UserProfile, career_recommendations: List[CareerRecommendation]) -> List[CollegeRecommendation]:
-        """Generate college recommendations based on user profile and career choices"""
         
         career_titles = [career.career_title for career in career_recommendations[:3]]
         
@@ -91,7 +87,6 @@ class CareerRecommendationSystem:
         return []
     
     def generate_roadmap(self, user_profile: UserProfile, career_recommendations: List[CareerRecommendation]) -> str:
-        """Generate a detailed roadmap for the user"""
         
         prompt = f"""
         Create a detailed 5-year roadmap for {user_profile.name} based on their profile and career recommendations:
@@ -133,7 +128,6 @@ class CareerRecommendationSystem:
         return response_text if response_text else "Unable to generate roadmap at this time."
     
     def display_career_recommendations(self, careers: List[CareerRecommendation]):
-        """Display career recommendations in a formatted way"""
         print("\n" + "="*60)
         print("CAREER RECOMMENDATIONS")
         print("="*60)
@@ -150,7 +144,6 @@ class CareerRecommendationSystem:
             print()
     
     def display_college_recommendations(self, colleges: List[CollegeRecommendation]):
-        """Display college recommendations in a formatted way"""
         print("\n" + "="*60)
         print("COLLEGE RECOMMENDATIONS")
         print("="*60)
