@@ -1,8 +1,6 @@
 from core.models import UserProfile
 
 def create_user_profile(form_data):
-    """Create a UserProfile object from form data"""
-    # Parse grades from string to dictionary
     grades_dict = {}
     if 'grades' in form_data and form_data['grades']:
         grade_pairs = form_data['grades'].split(',')
@@ -28,4 +26,5 @@ def create_user_profile(form_data):
         career_goals=form_data.get('career_goals'),
         location_preference=form_data.get('location_preference', 'Any'),
         budget_range=form_data.get('budget_range', 'Medium')
+
     )
