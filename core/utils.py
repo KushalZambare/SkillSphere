@@ -4,7 +4,7 @@ from typing import List, Dict
 from core.models import CareerRecommendation, CollegeRecommendation, UserProfile
 
 def make_ai_request(api_key: str, url: str, prompt: str) -> str:
-    """Make a request to Google AI API"""
+  
     try:
         headers = {
             "Content-Type": "application/json",
@@ -53,7 +53,7 @@ def make_ai_request(api_key: str, url: str, prompt: str) -> str:
         return ""
 
 def parse_career_response(response_text: str) -> List[CareerRecommendation]:
-    """Parse AI response to extract career recommendations"""
+    
     careers = []
     try:
         sections = response_text.split('CAREER ')
@@ -112,7 +112,7 @@ def parse_career_response(response_text: str) -> List[CareerRecommendation]:
     return careers
 
 def parse_college_response(response_text: str) -> List[CollegeRecommendation]:
-    """Parse AI response to extract college recommendations"""
+    
     colleges = []
     try:
         sections = response_text.split('COLLEGE ')
@@ -172,7 +172,7 @@ def parse_college_response(response_text: str) -> List[CollegeRecommendation]:
 
 def save_recommendations(user_profile: UserProfile, career_recommendations: List[CareerRecommendation], 
                         college_recommendations: List[CollegeRecommendation], roadmap: str):
-    """Save recommendations to a text file"""
+
     try:
         filename = f"{user_profile.name.replace(' ', '_')}_recommendations.txt"
         
@@ -208,4 +208,5 @@ def save_recommendations(user_profile: UserProfile, career_recommendations: List
         print(f"\nRecommendations saved to: {filename}")
         
     except Exception as e:
+
         print(f"Error saving recommendations: {e}")
