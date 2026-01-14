@@ -10,6 +10,7 @@
     <div class="container">
         <h1>Welcome to SkillSphere Career Guidance System</h1>
         <p>Please fill out your profile information below:</p>
+
         <form action="/submit" method="POST">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" required>
@@ -50,6 +51,15 @@
 
             <button type="submit">Submit</button>
         </form>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
     </div>
 </body>
 </html>
