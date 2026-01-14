@@ -1,7 +1,6 @@
 from core.models import UserProfile
 
 def create_user_profile(form_data):
-    # --- Validate required fields ---
     required_fields = [
         'name', 'age', 'current_grade',
         'academic_subjects', 'grades',
@@ -12,7 +11,6 @@ def create_user_profile(form_data):
         if not form_data.get(field):
             raise ValueError(f"{field.replace('_', ' ').title()} is required.")
 
-    # --- Parse Academic Subjects ---
     raw_subjects = form_data['academic_subjects']
 
     if ',' not in raw_subjects:
@@ -28,7 +26,6 @@ def create_user_profile(form_data):
     if not academic_subjects:
         raise ValueError("Academic subjects cannot be empty.")
 
-    # --- Parse Grades ---
     grades_dict = {}
     grade_pairs = form_data['grades'].split(',')
 
@@ -48,7 +45,6 @@ def create_user_profile(form_data):
 
         grades_dict[subject] = grade
 
-    # --- Optional Fields ---
     interests = [
         s.strip() for s in form_data.get('interests', '').split(',')
         if s.strip()
