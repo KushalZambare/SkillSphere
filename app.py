@@ -3,6 +3,7 @@ from core.user_input import create_user_profile
 from core.recommendation_system import CareerRecommendationSystem
 from core.utils import save_recommendations
 import requests  
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 
 app = Flask(__name__, 
             static_folder='static', 
