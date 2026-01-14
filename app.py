@@ -4,7 +4,9 @@ from core.recommendation_system import CareerRecommendationSystem
 from core.utils import save_recommendations
 import requests  
 
-app = Flask(__name__)
+app = Flask(__name__, 
+            static_folder='static', 
+            template_folder='templates')
 
 # Use Your API Key
 API_KEY = "Your API Key"
