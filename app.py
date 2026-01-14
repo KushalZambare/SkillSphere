@@ -5,6 +5,10 @@ from core.utils import save_recommendations
 import requests  
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
+app = Flask(__name__, 
+            static_folder='static', 
+            template_folder='templates')
+
 # Use Your API Key
 API_KEY = "Your API Key"
 system = CareerRecommendationSystem(API_KEY)
