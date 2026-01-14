@@ -3,61 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <title>Career and College Recommendations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Career and College Recommendations · SkillSphere</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Personalized Recommendations</h1>
-        
-        <h2>Career Recommendations</h2>
-        <div id="career-recommendations">
-            {% if career_recommendations %}
-                <ul>
-                    {% for career in career_recommendations %}
-                        <li>
-                            <h3>{{ career.career_title }}</h3>
-                            <p><strong>Description:</strong> {{ career.description }}</p>
-                            <p><strong>Required Skills:</strong> {{ career.required_skills | join(', ') }}</p>
-                            <p><strong>Education Path:</strong> {{ career.education_path }}</p>
-                            <p><strong>Job Prospects:</strong> {{ career.job_prospects }}</p>
-                            <p><strong>Salary Range:</strong> {{ career.salary_range }}</p>
-                            <p><strong>Growth Potential:</strong> {{ career.growth_potential }}</p>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No career recommendations available.</p>
-            {% endif %}
-        </div>
+    <div class="page">
+        <header class="site-header">
+            <div class="site-header-inner">
+                <div>
+                    <h1 class="site-title">SkillSphere</h1>
+                    <p class="site-tagline">Your personalized recommendations</p>
+                </div>
+            </div>
+        </header>
 
-        <h2>College Recommendations</h2>
-        <div id="college-recommendations">
-            {% if college_recommendations %}
-                <ul>
-                    {% for college in college_recommendations %}
-                        <li>
-                            <h3>{{ college.college_name }}</h3>
-                            <p><strong>Location:</strong> {{ college.location }}</p>
-                            <p><strong>Programs:</strong> {{ college.programs | join(', ') }}</p>
-                            <p><strong>Ranking:</strong> {{ college.ranking }}</p>
-                            <p><strong>Admission Requirements:</strong> {{ college.admission_requirements }}</p>
-                            <p><strong>Fees Range:</strong> {{ college.fees_range }}</p>
-                            <p><strong>Notable Features:</strong> {{ college.notable_features }}</p>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No college recommendations available.</p>
-            {% endif %}
-        </div>
+        <main class="page-main">
+            <div class="container results-layout">
+                <section class="results-section">
+                    <h1>Personalized recommendations</h1>
+                    <p class="page-intro">
+                        Based on your profile, SkillSphere has identified career paths, colleges, and a roadmap
+                        that align with your strengths and preferences.
+                    </p>
+                </section>
 
-        <h2>Personalized Roadmap</h2>
-        <div id="roadmap">
-            <p>{{ roadmap }}</p>
-        </div>
+                <section class="results-section results-section--careers" aria-labelledby="career-heading">
+                    <h2 id="career-heading">Career recommendations</h2>
+                    <div id="career-recommendations">
+                        {% if career_recommendations %}
+                            <ul class="results-list">
+                                {% for career in career_recommendations %}
+                                    <li class="results-item">
+                                        <h3>{{ career.career_title }}</h3>
+                                        <p><strong>Description:</strong> {{ career.description }}</p>
+                                        <p><strong>Required skills:</strong> {{ career.required_skills | join(', ') }}</p>
+                                        <p><strong>Education path:</strong> {{ career.education_path }}</p>
+                                        <p><strong>Job prospects:</strong> {{ career.job_prospects }}</p>
+                                        <p><strong>Salary range:</strong> {{ career.salary_range }}</p>
+                                        <p><strong>Growth potential:</strong> {{ career.growth_potential }}</p>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No career recommendations are available for the current profile.</p>
+                        {% endif %}
+                    </div>
+                </section>
 
-        <a href="{{ url_for('index') }}">Go back to input your profile</a>
+                <section class="results-section results-section--colleges" aria-labelledby="college-heading">
+                    <h2 id="college-heading">College recommendations</h2>
+                    <div id="college-recommendations">
+                        {% if college_recommendations %}
+                            <ul class="results-list">
+                                {% for college in college_recommendations %}
+                                    <li class="results-item">
+                                        <h3>{{ college.college_name }}</h3>
+                                        <p><strong>Location:</strong> {{ college.location }}</p>
+                                        <p><strong>Programs:</strong> {{ college.programs | join(', ') }}</p>
+                                        <p><strong>Ranking:</strong> {{ college.ranking }}</p>
+                                        <p><strong>Admission requirements:</strong> {{ college.admission_requirements }}</p>
+                                        <p><strong>Fees range:</strong> {{ college.fees_range }}</p>
+                                        <p><strong>Notable features:</strong> {{ college.notable_features }}</p>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No college recommendations are available for the current profile.</p>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <section class="results-section results-section--roadmap" aria-labelledby="roadmap-heading">
+                    <h2 id="roadmap-heading">Personalized roadmap</h2>
+                    <div id="roadmap">
+                        <p class="roadmap-text">{{ roadmap }}</p>
+                    </div>
+                </section>
+
+                <div class="back-link">
+                    <a href="{{ url_for('index') }}">← Back to update your profile</a>
+                </div>
+            </div>
+        </main>
+
+        <footer class="page-footer">
+            SkillSphere Career Guidance · Adjust your inputs anytime to refine these suggestions
+        </footer>
     </div>
 </body>
 </html>
