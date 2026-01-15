@@ -31,6 +31,11 @@
                     </p>
 
                     <form action="{{ url_for('recommendation.submit') }}" method="POST">
+                    {% if error %}
+                        <p class="error">{{ error }}</p>
+                    {% endif %}
+
+                    <form action="/submit" method="POST">
                         <div class="form-grid">
                             <div class="form-group">
                                 <label class="form-label" for="name">Name</label>
@@ -52,6 +57,7 @@
                                     Academic subjects <span>(comma-separated)</span>
                                 </label>
                                 <input class="form-control" type="text" id="academic_subjects" name="academic_subjects" required placeholder="e.g., Physics, Chemistry, Mathematics, English">
+                                <small class="error" id="academicSubjectsError"></small>
                                 <p class="form-helper">List the key subjects you are currently studying.</p>
                             </div>
 
@@ -60,6 +66,7 @@
                                     Grades <span>(subject: grade, comma-separated)</span>
                                 </label>
                                 <input class="form-control" type="text" id="grades" name="grades" required placeholder="e.g., Physics: A, Chemistry: B+, Mathematics: A+">
+                                <small class="error" id="gradesError"></small>
                                 <p class="form-helper">Match each subject with its grade to help us understand your strengths.</p>
                             </div>
 
@@ -68,6 +75,7 @@
                                     Interests <span>(comma-separated)</span>
                                 </label>
                                 <input class="form-control" type="text" id="interests" name="interests" placeholder="e.g., Problem-solving, Design, Writing">
+                                <small class="error" id="interestsError"></small>
                             </div>
 
                             <div class="form-group">
@@ -75,6 +83,7 @@
                                     Hobbies <span>(comma-separated)</span>
                                 </label>
                                 <input class="form-control" type="text" id="hobbies" name="hobbies" placeholder="e.g., Reading, Coding, Music">
+                                <small class="error" id="hobbiesError"></small>
                             </div>
 
                             <div class="form-group">
@@ -114,5 +123,98 @@
             SkillSphere Career Guidance · Powered by your profile and curated insights
         </footer>
     </div>
+    <script>
+        console.log("VALIDATION SCRIPT LOADED");
+
+        function looksLikeMultipleItemsWithoutComma(value) {
+            if (!value.trim()) return false;
+            if (value.includes(",")) return false;
+
+            const words = value.trim().split(/\s+/);
+            return words.length > 2; // allows "graphic design", blocks "coding painting"
+        }
+
+        function validateCommaSeparatedList(value) {
+            if (!value.trim()) return true;
+
+            const items = value.split(",");
+            for (let item of items) {
+            if (!/^[a-zA-Z ]+$/.test(item.trim())) {
+                return false;
+            }
+            }
+            return true;
+        }
+
+        document.querySelector("form").addEventListener("submit", function (e) {
+            let isValid = true;
+
+            // Academic Subjects
+            const subjects = document.getElementById("academic_subjects");
+            const subjectsError = document.getElementById("academicSubjectsError");
+
+            if (looksLikeMultipleItemsWithoutComma(subjects.value)) {
+            subjectsError.textContent =
+                "If you have multiple subjects, separate them with commas (e.g. Maths, Physics)";
+            isValid = false;
+            } else if (!validateCommaSeparatedList(subjects.value)) {
+            subjectsError.textContent =
+                "Only letters and commas are allowed";
+            isValid = false;
+            } else {
+            subjectsError.textContent = "";
+            }
+
+            // Grades (STRICT)
+            const grades = document.getElementById("grades");
+            const gradesError = document.getElementById("gradesError");
+            const gradesPattern =
+            /^([a-zA-Z ]+:\s*[A-F][+-]?)(,\s*[a-zA-Z ]+:\s*[A-F][+-]?)*$/;
+
+            if (!gradesPattern.test(grades.value.trim())) {
+            gradesError.textContent =
+                "Format: Subject: Grade (e.g. Math: A, Physics: B+)";
+            isValid = false;
+            } else {
+            gradesError.textContent = "";
+            }
+
+            // Interests
+            const interests = document.getElementById("interests");
+            const interestsError = document.getElementById("interestsError");
+
+            if (looksLikeMultipleItemsWithoutComma(interests.value)) {
+            interestsError.textContent =
+                "If you have multiple interests, separate them with commas (e.g. Coding, Painting)";
+            isValid = false;
+            } else if (!validateCommaSeparatedList(interests.value)) {
+            interestsError.textContent =
+                "Only letters and commas are allowed";
+            isValid = false;
+            } else {
+            interestsError.textContent = "";
+            }
+
+            // Hobbies
+            const hobbies = document.getElementById("hobbies");
+            const hobbiesError = document.getElementById("hobbiesError");
+
+            if (looksLikeMultipleItemsWithoutComma(hobbies.value)) {
+            hobbiesError.textContent =
+                "If you have multiple hobbies, separate them with commas (e.g. Reading, Music)";
+            isValid = false;
+            } else if (!validateCommaSeparatedList(hobbies.value)) {
+            hobbiesError.textContent =
+                "Only letters and commas are allowed";
+            isValid = false;
+            } else {
+            hobbiesError.textContent = "";
+            }
+
+            if (!isValid) {
+            e.preventDefault(); // stop form submission
+            }
+        });
+    </script>
 </body>
 </html>
