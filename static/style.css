@@ -355,3 +355,10 @@ p {
         width: 100%;
     }
 }
+
+.error {
+  color: #e53935;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
