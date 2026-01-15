@@ -1,7 +1,7 @@
 import requests
 import json
 from typing import List, Dict
-from core.models import CareerRecommendation, CollegeRecommendation, UserProfile
+from app.models import CareerRecommendation, CollegeRecommendation, UserProfile
 
 def make_ai_request(api_key: str, url: str, prompt: str) -> str:
   

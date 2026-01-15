@@ -1,4 +1,4 @@
-from core.models import UserProfile
+from app.models import UserProfile
 
 def create_user_profile(form_data):
     grades_dict = {}
