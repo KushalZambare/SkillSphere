@@ -30,6 +30,7 @@
                         can generate tailored career and college recommendations for you.
                     </p>
 
+                    <form action="{{ url_for('recommendation.submit') }}" method="POST">
                     {% if error %}
                         <p class="error">{{ error }}</p>
                     {% endif %}

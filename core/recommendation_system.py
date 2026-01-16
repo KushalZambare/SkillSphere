@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from core.models import UserProfile, CareerRecommendation, CollegeRecommendation
+from app.models import UserProfile, CareerRecommendation, CollegeRecommendation
 from core.utils import make_ai_request, parse_career_response, parse_college_response  # Fixed the typo
 from typing import List
 
