@@ -67,7 +67,7 @@ SkillSphere/
    Enter your academic details, interests and preferences, then submit the form to receive your personalized recommendations and roadmap.
 
 4. **Save your results:**
-   Download your recommendations and roadmap for future planning.
+   Download your Recommendations and Roadmap for future planning.
 
 ---
 
