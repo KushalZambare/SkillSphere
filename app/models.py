@@ -6,10 +6,7 @@ from datetime import datetime
 from sqlalchemy.sql import func
 from werkzeug.security import generate_password_hash, check_password_hash
 
-
-# ============================================================================
 # SQLAlchemy Database Models
-# ============================================================================
 
 class User(UserMixin, db.Model):
     """
@@ -47,18 +44,16 @@ class Roadmap(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
-    content = db.Column(db.Text, nullable=False)  # Can store JSON or text roadmap data
+    content = db.Column(db.Text, nullable=False)  
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     
     def __repr__(self):
         return f'<Roadmap {self.id} for User {self.user_id}>'
 
-
-# ============================================================================
 # Dataclasses for application logic (kept for backward compatibility)
-# ============================================================================
 
 @dataclass
+
 class UserProfile:
     name: str
     age: int

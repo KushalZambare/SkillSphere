@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Career and College Recommendations</title>
 </head>
+
 <body>
     <div class="page">
         <header class="site-header">
@@ -36,21 +38,21 @@
                     <h2 id="career-heading">Career recommendations</h2>
                     <div id="career-recommendations">
                         {% if career_recommendations %}
-                            <ul class="results-list">
-                                {% for career in career_recommendations %}
-                                    <li class="results-item">
-                                        <h3>{{ career.career_title }}</h3>
-                                        <p><strong>Description:</strong> {{ career.description }}</p>
-                                        <p><strong>Required skills:</strong> {{ career.required_skills | join(', ') }}</p>
-                                        <p><strong>Education path:</strong> {{ career.education_path }}</p>
-                                        <p><strong>Job prospects:</strong> {{ career.job_prospects }}</p>
-                                        <p><strong>Salary range:</strong> {{ career.salary_range }}</p>
-                                        <p><strong>Growth potential:</strong> {{ career.growth_potential }}</p>
-                                    </li>
-                                {% endfor %}
-                            </ul>
+                        <ul class="results-list">
+                            {% for career in career_recommendations %}
+                            <li class="results-item">
+                                <h3>{{ career.career_title }}</h3>
+                                <p><strong>Description:</strong> {{ career.description }}</p>
+                                <p><strong>Required skills:</strong> {{ career.required_skills | join(', ') }}</p>
+                                <p><strong>Education path:</strong> {{ career.education_path }}</p>
+                                <p><strong>Job prospects:</strong> {{ career.job_prospects }}</p>
+                                <p><strong>Salary range:</strong> {{ career.salary_range }}</p>
+                                <p><strong>Growth potential:</strong> {{ career.growth_potential }}</p>
+                            </li>
+                            {% endfor %}
+                        </ul>
                         {% else %}
-                            <p>No career recommendations are available for the current profile.</p>
+                        <p>No career recommendations are available for the current profile.</p>
                         {% endif %}
                     </div>
                 </section>
@@ -59,21 +61,21 @@
                     <h2 id="college-heading">College recommendations</h2>
                     <div id="college-recommendations">
                         {% if college_recommendations %}
-                            <ul class="results-list">
-                                {% for college in college_recommendations %}
-                                    <li class="results-item">
-                                        <h3>{{ college.college_name }}</h3>
-                                        <p><strong>Location:</strong> {{ college.location }}</p>
-                                        <p><strong>Programs:</strong> {{ college.programs | join(', ') }}</p>
-                                        <p><strong>Ranking:</strong> {{ college.ranking }}</p>
-                                        <p><strong>Admission requirements:</strong> {{ college.admission_requirements }}</p>
-                                        <p><strong>Fees range:</strong> {{ college.fees_range }}</p>
-                                        <p><strong>Notable features:</strong> {{ college.notable_features }}</p>
-                                    </li>
-                                {% endfor %}
-                            </ul>
+                        <ul class="results-list">
+                            {% for college in college_recommendations %}
+                            <li class="results-item">
+                                <h3>{{ college.college_name }}</h3>
+                                <p><strong>Location:</strong> {{ college.location }}</p>
+                                <p><strong>Programs:</strong> {{ college.programs | join(', ') }}</p>
+                                <p><strong>Ranking:</strong> {{ college.ranking }}</p>
+                                <p><strong>Admission requirements:</strong> {{ college.admission_requirements }}</p>
+                                <p><strong>Fees range:</strong> {{ college.fees_range }}</p>
+                                <p><strong>Notable features:</strong> {{ college.notable_features }}</p>
+                            </li>
+                            {% endfor %}
+                        </ul>
                         {% else %}
-                            <p>No college recommendations are available for the current profile.</p>
+                        <p>No college recommendations are available for the current profile.</p>
                         {% endif %}
                     </div>
                 </section>
@@ -81,7 +83,39 @@
                 <section class="results-section results-section--roadmap" aria-labelledby="roadmap-heading">
                     <h2 id="roadmap-heading">Personalized roadmap</h2>
                     <div id="roadmap">
+                        {% if roadmap is iterable and roadmap is not string %}
+                        <div class="roadmap-timeline">
+                            {% for phase in roadmap %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <span class="timeline-period">{{ phase.period }}</span>
+                                    <h3 class="timeline-title">{{ phase.title }}</h3>
+                                    <p class="timeline-objective">{{ phase.objective }}</p>
+
+                                    <div class="timeline-actions">
+                                        {% for item in phase.action_items %}
+                                        <div class="action-card">
+                                            <span class="action-category">{{ item.category }}</span>
+                                            <p class="action-task">{{ item.task }}</p>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    {% if phase.milestones %}
+                                    <ul class="timeline-milestones">
+                                        {% for milestone in phase.milestones %}
+                                        <li>✓ {{ milestone }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
                         <p class="roadmap-text">{{ roadmap }}</p>
+                        {% endif %}
                     </div>
                 </section>
 
@@ -96,4 +130,5 @@
         </footer>
     </div>
 </body>
+
 </html>

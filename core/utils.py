@@ -3,31 +3,39 @@ import json
 from typing import List, Dict
 from app.models import CareerRecommendation, CollegeRecommendation, UserProfile
 
-def make_ai_request(api_key: str, url: str, prompt: str) -> str:
+def make_ai_request(api_key: str, url: str, prompt: str, model: str = "google/gemini-2.0-flash-001") -> str:
   
     try:
         headers = {
             "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}",
+            "HTTP-Referer": "https://github.com/KushalZambare/SkillSphere", 
+            "X-Title": "SkillSphere Career Guidance", 
         }
         
         data = {
-            "contents": [{
-                "parts": [{
-                    "text": prompt
-                }]
-            }]
+            "model": model,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
         }
         
-        params = {
-            "key": api_key
-        }
-        
-        response = requests.post(url, headers=headers, json=data, params=params, timeout=30)
+        response = requests.post(url, headers=headers, json=data, timeout=60)
         response.raise_for_status()
         
         result = response.json()
-        if "candidates" in result and len(result["candidates"]) > 0:
-            return result["candidates"][0]["content"]["parts"][0]["text"]
+        
+        # DEBUG LOGGING
+        with open("raw_api_response.log", "a", encoding="utf-8") as f:
+            f.write("=== NEW REQUEST ===\n")
+            f.write(json.dumps(result, indent=2))
+            f.write("\n\n")
+            
+        if "choices" in result and len(result["choices"]) > 0:
+            return result["choices"][0]["message"]["content"]
         else:
             print(f"Unexpected API response format: {result}")
             return ""
@@ -53,10 +61,11 @@ def make_ai_request(api_key: str, url: str, prompt: str) -> str:
         return ""
 
 def parse_career_response(response_text: str) -> List[CareerRecommendation]:
-    
+    import re
     careers = []
     try:
-        sections = response_text.split('CAREER ')
+        # Case-insensitive split on CAREER [digit]:
+        sections = re.split(r'(?i)CAREER\s*\d*[:\s-]*', response_text)
         
         for section in sections[1:]:
             lines = section.strip().split('\n')
@@ -78,27 +87,36 @@ def parse_career_response(response_text: str) -> List[CareerRecommendation]:
                     continue
                     
                 if ':' in line:
-                    key, value = line.split(':', 1)
-                    key = key.strip().lower().replace(' ', '_')
+                    key_raw, value = line.split(':', 1)
+                    key = re.sub(r'[^a-z0-9\s]', '', key_raw.lower()).strip().replace(' ', '_')
                     value = value.strip()
                     
-                    if key == 'career_title':
+                    if 'career_title' in key:
                         career_data['career_title'] = value
-                    elif key == 'description':
+                    elif 'description' in key:
                         career_data['description'] = value
-                    elif key == 'required_skills':
+                    elif 'required_skills' in key or 'skills' in key:
                         career_data['required_skills'] = [s.strip() for s in value.split(',')]
-                    elif key == 'education_path':
+                    elif 'education_path' in key:
                         career_data['education_path'] = value
-                    elif key == 'job_prospects':
+                    elif 'job_prospects' in key:
                         career_data['job_prospects'] = value
-                    elif key == 'salary_range':
+                    elif 'salary_range' in key:
                         career_data['salary_range'] = value
-                    elif key == 'growth_potential':
+                    elif 'growth_potential' in key:
                         career_data['growth_potential'] = value
                     current_field = key
-                elif current_field and current_field not in ['required_skills']:
-                    career_data[current_field] += ' ' + line
+                elif current_field:
+                    lookup_field = None
+                    if 'career_title' in current_field: lookup_field = 'career_title'
+                    elif 'description' in current_field: lookup_field = 'description'
+                    elif 'education_path' in current_field: lookup_field = 'education_path'
+                    elif 'job_prospects' in current_field: lookup_field = 'job_prospects'
+                    elif 'salary_range' in current_field: lookup_field = 'salary_range'
+                    elif 'growth_potential' in current_field: lookup_field = 'growth_potential'
+                    
+                    if lookup_field and lookup_field != 'required_skills':
+                        career_data[lookup_field] += ' ' + line
             
             if career_data['career_title'] and career_data['description']:
                 careers.append(CareerRecommendation(**career_data))
@@ -112,10 +130,10 @@ def parse_career_response(response_text: str) -> List[CareerRecommendation]:
     return careers
 
 def parse_college_response(response_text: str) -> List[CollegeRecommendation]:
-    
+    import re
     colleges = []
     try:
-        sections = response_text.split('COLLEGE ')
+        sections = re.split(r'(?i)COLLEGE\s*\d*[:\s-]*', response_text)
         
         for section in sections[1:]:
             lines = section.strip().split('\n')
@@ -137,27 +155,36 @@ def parse_college_response(response_text: str) -> List[CollegeRecommendation]:
                     continue
                     
                 if ':' in line:
-                    key, value = line.split(':', 1)
-                    key = key.strip().lower().replace(' ', '_')
+                    key_raw, value = line.split(':', 1)
+                    key = re.sub(r'[^a-z0-9\s]', '', key_raw.lower()).strip().replace(' ', '_')
                     value = value.strip()
                     
-                    if key == 'college_name':
+                    if 'college_name' in key:
                         college_data['college_name'] = value
-                    elif key == 'location':
+                    elif 'location' in key:
                         college_data['location'] = value
-                    elif key == 'programs':
+                    elif 'programs' in key:
                         college_data['programs'] = [s.strip() for s in value.split(',')]
-                    elif key == 'ranking':
+                    elif 'ranking' in key:
                         college_data['ranking'] = value
-                    elif key == 'admission_requirements':
+                    elif 'admission_requirements' in key:
                         college_data['admission_requirements'] = value
-                    elif key == 'fees_range':
+                    elif 'fees_range' in key:
                         college_data['fees_range'] = value
-                    elif key == 'notable_features':
+                    elif 'notable_features' in key:
                         college_data['notable_features'] = value
                     current_field = key
-                elif current_field and current_field not in ['programs']:
-                    college_data[current_field] += ' ' + line
+                elif current_field:
+                    lookup_field = None
+                    if 'college_name' in current_field: lookup_field = 'college_name'
+                    elif 'location' in current_field: lookup_field = 'location'
+                    elif 'ranking' in current_field: lookup_field = 'ranking'
+                    elif 'admission_requirements' in current_field: lookup_field = 'admission_requirements'
+                    elif 'fees_range' in current_field: lookup_field = 'fees_range'
+                    elif 'notable_features' in current_field: lookup_field = 'notable_features'
+                    
+                    if lookup_field and lookup_field != 'programs':
+                        college_data[lookup_field] += ' ' + line
             
             if college_data['college_name'] and college_data['location']:
                 colleges.append(CollegeRecommendation(**college_data))
@@ -203,7 +230,17 @@ def save_recommendations(user_profile: UserProfile, career_recommendations: List
                 f.write(f"Notable Features: {college.notable_features}\n\n")
             
             f.write("\n=== PERSONALIZED ROADMAP ===\n")
-            f.write(roadmap)
+            if isinstance(roadmap, list):
+                for phase in roadmap:
+                    f.write(f"\n{phase.get('title', 'Phase')} ({phase.get('period', 'TBD')})\n")
+                    f.write(f"Objective: {phase.get('objective', '')}\n")
+                    f.write("Actions:\n")
+                    for item in phase.get('action_items', []):
+                        f.write(f"  - [{item.get('category', '')}] {item.get('task', '')}\n")
+                    if phase.get('milestones'):
+                        f.write("Milestones: " + ", ".join(phase['milestones']) + "\n")
+            else:
+                f.write(roadmap)
         
         print(f"\nRecommendations saved to: {filename}")
         

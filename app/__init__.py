@@ -26,7 +26,7 @@ def create_app(config_class=None):
     else:
         # Default configuration
         app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-        app.config['API_KEY'] = os.environ.get('API_KEY', 'Your API Key')
+        app.config['API_KEY'] = os.environ.get('API_KEY', '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')
         # Database configuration
         app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

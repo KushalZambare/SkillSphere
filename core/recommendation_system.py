@@ -1,13 +1,14 @@
 from flask import request, jsonify
 from app.models import UserProfile, CareerRecommendation, CollegeRecommendation
-from core.utils import make_ai_request, parse_career_response, parse_college_response  # Fixed the typo
+from core.utils import make_ai_request, parse_career_response, parse_college_response
 from typing import List
 
 class CareerRecommendationSystem:
     
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str, model: str = "google/gemini-2.0-flash-001"):
         self.api_key = api_key
-        self.base_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+        self.base_url = "https://openrouter.ai/api/v1/chat/completions"
+        self.model = model
     
     def generate_career_recommendations(self, user_profile: UserProfile) -> List[CareerRecommendation]:
         
@@ -43,7 +44,7 @@ class CareerRecommendationSystem:
         Continue for 5 careers total.
         """
         
-        response_text = make_ai_request(self.api_key, self.base_url, prompt)
+        response_text = make_ai_request(self.api_key, self.base_url, prompt, self.model)
         if response_text:
             return parse_career_response(response_text)
         return []
@@ -81,15 +82,32 @@ class CareerRecommendationSystem:
         Continue for 8 colleges total. Focus on institutions that are accessible based on current academic performance and aligned with location/budget preferences.
         """
         
-        response_text = make_ai_request(self.api_key, self.base_url, prompt)
+        response_text = make_ai_request(self.api_key, self.base_url, prompt, self.model)
         if response_text:
             return parse_college_response(response_text)
         return []
     
-    def generate_roadmap(self, user_profile: UserProfile, career_recommendations: List[CareerRecommendation]) -> str:
+    def generate_roadmap(self, user_profile: UserProfile, career_recommendations: List[CareerRecommendation]) -> List[dict]:
         
         prompt = f"""
-        Create a detailed 5-year roadmap for {user_profile.name} based on their profile and career recommendations:
+        Create a detailed 5-year roadmap for {user_profile.name} based on their profile and career recommendations.
+        Return the response as a valid JSON object ONLY, with no preamble or markdown formatting.
+        
+        The JSON structure should be a list of phases:
+        [
+          {{
+            "title": "Phase Title (e.g. IMMEDIATE STEPS)",
+            "period": "Time period (e.g. Next 6 months)",
+            "objective": "Brief objective for this phase",
+            "action_items": [
+              {{
+                "category": "Academic/Skill/Extracurricular/etc",
+                "task": "Specific actionable task"
+              }}
+            ],
+            "milestones": ["Milestone 1", "Milestone 2"]
+          }}
+        ]
 
         Student Profile:
         - Current Grade: {user_profile.current_grade}
@@ -99,19 +117,11 @@ class CareerRecommendationSystem:
 
         Top Career Options: {', '.join([career.career_title for career in career_recommendations[:3]])}
 
-        Create a roadmap with these sections:
-        
-        IMMEDIATE STEPS (Next 6 months):
-        - [Specific actions to take now]
-        
-        SHORT-TERM GOALS (6 months - 2 years):
-        - [Academic and skill development goals]
-        
-        MEDIUM-TERM GOALS (2-4 years):
-        - [College and advanced preparation]
-        
-        LONG-TERM VISION (4-5 years):
-        - [Career entry and growth]
+        Create 4 phases:
+        1. IMMEDIATE STEPS (Next 6 months)
+        2. SHORT-TERM GOALS (6 months - 2 years)
+        3. MEDIUM-TERM GOALS (2-4 years)
+        4. LONG-TERM VISION (4-5 years)
 
         For each phase, include specific, actionable items related to:
         - Academic focus areas
@@ -119,13 +129,25 @@ class CareerRecommendationSystem:
         - Extracurricular activities
         - Networking opportunities
         - Certification/course recommendations
-        - Milestone achievements
-
-        Make it practical and tailored to their current situation.
         """
         
-        response_text = make_ai_request(self.api_key, self.base_url, prompt)
-        return response_text if response_text else "Unable to generate roadmap at this time."
+        response_text = make_ai_request(self.api_key, self.base_url, prompt, self.model)
+        
+        if response_text:
+            try:
+                clean_json = response_text.strip()
+                if clean_json.startswith("```json"):
+                    clean_json = clean_json[7:-3].strip()
+                elif clean_json.startswith("```"):
+                    clean_json = clean_json[3:-3].strip()
+                
+                import json
+                return json.loads(clean_json)
+            except Exception as e:
+                print(f"Error parsing roadmap JSON: {e}")
+                print(f"Raw response: {response_text[:200]}...")
+        
+        return []
     
     def display_career_recommendations(self, careers: List[CareerRecommendation]):
         print("\n" + "="*60)
