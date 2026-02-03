@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <title>SkillSphere Career Guidance System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -49,9 +48,18 @@
                     </p>
 
                     <form action="{{ url_for('recommendation.submit') }}" method="POST">
-                    {% if error %}
-                        <p class="error">{{ error }}</p>
-                    {% endif %}
+                        {% if error %}
+                            <p class="error">{{ error }}</p>
+                        {% endif %}
+
+                        <div class="form-group" style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px dashed #ccc; text-align: center; margin-bottom: 20px;">
+                            <p style="margin-bottom: 10px; font-weight: 500; color: #555;">Have a resume?</p>
+                            <button type="button" id="uploadBtn" class="btn-primary" style="background-color: #2563eb; width: auto; padding: 0.6rem 1.2rem;">
+                                📄 Auto-fill from Resume
+                            </button>
+                            <input type="file" id="resumeInput" name="resume" accept=".pdf,.docx" style="display: none;">
+                            <p id="uploadStatus" style="font-size: 0.85rem; margin-top: 8px; color: #666; font-weight: 500; min-height: 1.2em;"></p>
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label class="form-label" for="name">Name</label>
@@ -157,7 +165,93 @@
             SkillSphere Career Guidance · Powered by your profile and curated insights
         </footer>
     </div>
+    
     <script>
+        // === 1. RESUME AUTO-FILL SCRIPT ===
+        document.addEventListener("DOMContentLoaded", function() {
+            const uploadBtn = document.getElementById("uploadBtn");
+            const resumeInput = document.getElementById("resumeInput");
+            const statusText = document.getElementById("uploadStatus");
+
+            if(uploadBtn && resumeInput) {
+                // Trigger file input when button is clicked
+                uploadBtn.addEventListener("click", function() {
+                    resumeInput.click();
+                });
+
+                // Handle file selection
+                resumeInput.addEventListener("change", function() {
+                    if (this.files.length > 0) {
+                        const file = this.files[0];
+                        uploadResume(file);
+                    }
+                });
+            }
+
+            function uploadResume(file) {
+                const formData = new FormData();
+                formData.append("resume", file);
+
+                statusText.textContent = "Parsing resume... please wait.";
+                statusText.style.color = "#2563eb";
+
+                // Ensure this matches the route defined in app.py
+                fetch("{{ url_for('upload_resume') }}", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.error || 'Server Error'); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        statusText.textContent = "Error: " + data.error;
+                        statusText.style.color = "red";
+                    } else {
+                        // AUTO-FILL LOGIC
+                        let addedFields = [];
+
+                        // 1. Fill Interests from Skills
+                        if (data.skills && data.skills.length > 0) {
+                            const interestsField = document.getElementById("interests");
+                            const newInterests = data.skills.join(", ");
+                            
+                            if (interestsField.value.trim() !== "") {
+                                interestsField.value += ", " + newInterests;
+                            } else {
+                                interestsField.value = newInterests;
+                            }
+                            addedFields.push("Interests");
+                        }
+
+                        // 2. Alert user about Education
+                        if (data.education && data.education.length > 0) {
+                             console.log("Found Education:", data.education);
+                             // We don't auto-fill grade as it's complex, but we notify the user
+                             addedFields.push("Education info detected");
+                        }
+
+                        if (addedFields.length > 0) {
+                            statusText.textContent = "Success! " + addedFields[0] + " updated from resume.";
+                            statusText.style.color = "#059669"; // Green
+                        } else {
+                            statusText.textContent = "Resume parsed, but no matching keywords found.";
+                            statusText.style.color = "#d97706"; // Orange
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    statusText.textContent = "Error: " + error.message;
+                    statusText.style.color = "red";
+                });
+            }
+        });
+
+        // === 2. FORM VALIDATION SCRIPT ===
         console.log("VALIDATION SCRIPT LOADED");
 
         function looksLikeMultipleItemsWithoutComma(value) {
@@ -173,82 +267,71 @@
 
             const items = value.split(",");
             for (let item of items) {
-            if (!/^[a-zA-Z ]+$/.test(item.trim())) {
-                return false;
-            }
+                // Allow letters, spaces, and basic punctuation like periods/hyphens if needed
+                if (!/^[a-zA-Z0-9\s\.\+\-\#]+$/.test(item.trim())) {
+                     // expanded regex slightly to allow C++, C#, node.js etc.
+                    return false;
+                }
             }
             return true;
         }
 
-        document.querySelector("form").addEventListener("submit", function (e) {
-            let isValid = true;
+        const mainForm = document.querySelector("form");
+        if(mainForm) {
+            mainForm.addEventListener("submit", function (e) {
+                let isValid = true;
 
-            // Academic Subjects
-            const subjects = document.getElementById("academic_subjects");
-            const subjectsError = document.getElementById("academicSubjectsError");
+                // Academic Subjects
+                const subjects = document.getElementById("academic_subjects");
+                const subjectsError = document.getElementById("academicSubjectsError");
 
-            if (looksLikeMultipleItemsWithoutComma(subjects.value)) {
-            subjectsError.textContent =
-                "If you have multiple subjects, separate them with commas (e.g. Maths, Physics)";
-            isValid = false;
-            } else if (!validateCommaSeparatedList(subjects.value)) {
-            subjectsError.textContent =
-                "Only letters and commas are allowed";
-            isValid = false;
-            } else {
-            subjectsError.textContent = "";
-            }
+                if (looksLikeMultipleItemsWithoutComma(subjects.value)) {
+                    subjectsError.textContent = "If you have multiple subjects, separate them with commas (e.g. Maths, Physics)";
+                    isValid = false;
+                } else {
+                    subjectsError.textContent = "";
+                }
 
-            // Grades (STRICT)
-            const grades = document.getElementById("grades");
-            const gradesError = document.getElementById("gradesError");
-            const gradesPattern =
-            /^([a-zA-Z ]+:\s*[A-F][+-]?)(,\s*[a-zA-Z ]+:\s*[A-F][+-]?)*$/;
+                // Grades (STRICT)
+                const grades = document.getElementById("grades");
+                const gradesError = document.getElementById("gradesError");
+                // Regex: Allow Subject: Grade format. 
+                const gradesPattern = /^([a-zA-Z0-9\s\+\-\.]+\s*:\s*[A-F0-9][\+\-]?)(,\s*[a-zA-Z0-9\s\+\-\.]+\s*:\s*[A-F0-9][\+\-]?)*$/;
 
-            if (!gradesPattern.test(grades.value.trim())) {
-            gradesError.textContent =
-                "Format: Subject: Grade (e.g. Math: A, Physics: B+)";
-            isValid = false;
-            } else {
-            gradesError.textContent = "";
-            }
+                if (!gradesPattern.test(grades.value.trim())) {
+                    gradesError.textContent = "Format: Subject: Grade (e.g. Math: A, Physics: B+)";
+                    isValid = false;
+                } else {
+                    gradesError.textContent = "";
+                }
 
-            // Interests
-            const interests = document.getElementById("interests");
-            const interestsError = document.getElementById("interestsError");
+                // Interests
+                const interests = document.getElementById("interests");
+                const interestsError = document.getElementById("interestsError");
 
-            if (looksLikeMultipleItemsWithoutComma(interests.value)) {
-            interestsError.textContent =
-                "If you have multiple interests, separate them with commas (e.g. Coding, Painting)";
-            isValid = false;
-            } else if (!validateCommaSeparatedList(interests.value)) {
-            interestsError.textContent =
-                "Only letters and commas are allowed";
-            isValid = false;
-            } else {
-            interestsError.textContent = "";
-            }
+                if (looksLikeMultipleItemsWithoutComma(interests.value)) {
+                    interestsError.textContent = "If you have multiple interests, separate them with commas (e.g. Coding, Painting)";
+                    isValid = false;
+                } else {
+                    interestsError.textContent = "";
+                }
 
-            // Hobbies
-            const hobbies = document.getElementById("hobbies");
-            const hobbiesError = document.getElementById("hobbiesError");
+                // Hobbies
+                const hobbies = document.getElementById("hobbies");
+                const hobbiesError = document.getElementById("hobbiesError");
 
-            if (looksLikeMultipleItemsWithoutComma(hobbies.value)) {
-            hobbiesError.textContent =
-                "If you have multiple hobbies, separate them with commas (e.g. Reading, Music)";
-            isValid = false;
-            } else if (!validateCommaSeparatedList(hobbies.value)) {
-            hobbiesError.textContent =
-                "Only letters and commas are allowed";
-            isValid = false;
-            } else {
-            hobbiesError.textContent = "";
-            }
+                if (looksLikeMultipleItemsWithoutComma(hobbies.value)) {
+                    hobbiesError.textContent = "If you have multiple hobbies, separate them with commas (e.g. Reading, Music)";
+                    isValid = false;
+                } else {
+                    hobbiesError.textContent = "";
+                }
 
-            if (!isValid) {
-            e.preventDefault(); // stop form submission
-            }
-        });
+                if (!isValid) {
+                    e.preventDefault(); // stop form submission
+                }
+            });
+        }
     </script>
 </body>
 </html>

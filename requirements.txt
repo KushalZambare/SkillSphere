@@ -1,7 +1,9 @@
-Flask==2.0.3
-Werkzeug==2.0.3
-requests==2.26.0
+Flask==3.0.0
+Werkzeug==3.0.1
+requests==2.31.0
 dataclasses-json==0.5.7
 Flask-SQLAlchemy==3.0.5
 Flask-Migrate==4.0.5
 Flask-Login==0.6.3
+pypdf
+python-docx
