@@ -1,5 +1,8 @@
 import requests
 import json
+import pypdf
+import docx
+import io
 from typing import List, Dict
 from app.models import CareerRecommendation, CollegeRecommendation, UserProfile
 
@@ -247,3 +250,75 @@ def save_recommendations(user_profile: UserProfile, career_recommendations: List
     except Exception as e:
 
         print(f"Error saving recommendations: {e}")
+
+def extract_text_from_pdf(file_stream):
+    """Extracts text from a PDF file stream."""
+    try:
+        reader = pypdf.PdfReader(file_stream)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() + "\n"
+        return text
+    except Exception as e:
+        print(f"Error reading PDF: {e}")
+        return ""
+
+def extract_text_from_docx(file_stream):
+    """Extracts text from a DOCX file stream."""
+    try:
+        doc = docx.Document(file_stream)
+        text = "\n".join([para.text for para in doc.paragraphs])
+        return text
+    except Exception as e:
+        print(f"Error reading DOCX: {e}")
+        return ""
+
+def parse_resume(file_stream, filename):
+    """
+    Orchestrates the parsing of a resume file.
+    Returns a dictionary with 'skills' (list) and 'education' (list).
+    """
+    text = ""
+    filename = filename.lower()
+
+    # 1. Extract Raw Text
+    if filename.endswith('.pdf'):
+        text = extract_text_from_pdf(file_stream)
+    elif filename.endswith('.docx'):
+        text = extract_text_from_docx(file_stream)
+    else:
+        return None  # Unsupported file type
+
+    # Normalize text for searching
+    text_lower = text.lower()
+
+    # 2. Define Keywords
+    SKILL_KEYWORDS = [
+        "python", "java", "c++", "javascript", "html", "css", "sql", "flask", 
+        "django", "react", "node.js", "docker", "kubernetes", "aws", "git", 
+        "machine learning", "data analysis", "communication", "leadership", 
+        "problem-solving", "design", "writing"
+    ]
+
+    EDUCATION_KEYWORDS = [
+        "b.tech", "b.e.", "b.sc", "m.tech", "m.s.", "mba", "phd", 
+        "bachelor", "master", "diploma", "computer science", "10th", "12th"
+    ]
+
+    # 3. Parsing Logic
+    extracted_data = {
+        "skills": [],
+        "education": []
+    }
+
+    # Match Skills
+    for skill in SKILL_KEYWORDS:
+        if skill in text_lower:
+            extracted_data["skills"].append(skill.title())
+
+    # Match Education
+    for edu in EDUCATION_KEYWORDS:
+        if edu in text_lower:
+            extracted_data["education"].append(edu.upper())
+
+    return extracted_data
