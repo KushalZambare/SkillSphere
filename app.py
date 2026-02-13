@@ -12,7 +12,7 @@ app = Flask(__name__,
 app.secret_key = 'super_secret_key_change_this_in_production'
 
 # === 1. CONNECT DATABASE (CRITICAL FIX) ===
-# We must configure the DB and connect it to the app, 
+# We must configure the DB and Connect it to the app, 
 # otherwise 'User.query' crashes in the auth routes.
 
 # A. Configure the Database URI (Using standard SQLite path)
