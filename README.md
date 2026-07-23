@@ -1,7 +1,7 @@
 
 # SkillSphere Career Guidance System
 
-SkillSphere is an AI-powered web application that provides personalized career and college recommendations based on a student's academic profile, interests, and goals. Leveraging advanced AI models, SkillSphere helps students make informed decisions about their future education and career paths.
+SkillSphere is an AI-powered web application that provides personalized career and college recommendations based on a student's academic profile, interests, and goals. Leveraging advanced AI models, SkillSphere helps students make informed Decisions about their future education and career paths.
 
 ---
 
