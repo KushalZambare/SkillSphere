@@ -5,7 +5,7 @@ SkillSphere is an AI-powered web application that provides personalized career a
 
 ---
 
-## 🚀 How SkillSphere Works
+## 🚀 How SkillSphere Work
 
 1. Users enter their academic background, interests, and goals.
 2. The system analyzes the input using predefined logic.
